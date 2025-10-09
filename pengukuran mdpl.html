@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Perkiraan Waktu Kecamatan Tenggelam</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    background: #f0f8ff;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #007acc;
+  }
+  label {
+    display: block;
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  select, button {
+    width: 100%;
+    max-width: 300px;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 1rem;
+  }
+  button {
+    background-color: #007acc;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 30px;
+  }
+  button:hover {
+    background-color: #005f99;
+  }
+  .result {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #d9f0ff;
+    border-radius: 6px;
+    max-width: 400px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Perkiraan Waktu Kecamatan Tenggelam</h1>
+
+<label for="wilayah">Pilih Wilayah:</label>
+<select id="wilayah">
+  <option value="">-- Pilih Wilayah --</option>
+  <option value="pusat">Surabaya Pusat</option>
+  <option value="timur">Surabaya Timur</option>
+  <option value="barat">Surabaya Barat</option>
+  <option value="selatan">Surabaya Selatan</option>
+  <option value="utara">Surabaya Utara</option>
+</select>
+
+<label for="kecamatan">Pilih Kecamatan:</label>
+<select id="kecamatan" disabled>
+  <option value="">-- Pilih Kecamatan --</option>
+</select>
+
+<button id="hitungBtn" disabled>Hitung Waktu Tenggelam</button>
+
+<div class="result" id="hasil"></div>
+
+<script>
+  const dataWilayah = {
+    pusat: [
+      {kecamatan: 'Genteng', mdpl: 6.7},
+      {kecamatan: 'Tegalsari', mdpl: 7.7},
+      {kecamatan: 'Simokerto', mdpl: 3.7},
+      {kecamatan: 'Bubutan', mdpl: 4.7}
+    ],
+    utara: [
+      {kecamatan: 'Kenjeran', mdpl: 4.7},
+      {kecamatan: 'Pabean Cantikan', mdpl: 3.7},
+      {kecamatan: 'Semampir', mdpl: 5.7},
+      {kecamatan: 'Krembangan', mdpl: 3.7}
+    ],
+    timur: [
+      {kecamatan: 'Gubeng', mdpl: 5.7},
+      {kecamatan: 'Gunung Anyar', mdpl: 2.7},
+      {kecamatan: 'Sukolilo', mdpl: 3.7},
+      {kecamatan: 'Tambaksari', mdpl: 5.7},
+      {kecamatan: 'Mulyorejo', mdpl: 0.7},
+      {kecamatan: 'Rungkut', mdpl: 4.7},
+      {kecamatan: 'Tenggilis Mejoyo', mdpl: 6.7}
+    ],
+    barat: [
+      {kecamatan: 'Benowo', mdpl: 10.7},
+      {kecamatan: 'Pakal', mdpl: 5.7},
+      {kecamatan: 'Asemrowo', mdpl: 4.7},
+      {kecamatan: 'Sukomanunggal', mdpl: 5.7},
+      {kecamatan: 'Tandes', mdpl: 8.7},
+      {kecamatan: 'Sambikerep', mdpl: 17.7},
+      {kecamatan: 'Lakarsantri', mdpl: 9.7},
+      {kecamatan: 'Bulak', mdpl: 0.7}
+    ],
+    selatan: [
+      {kecamatan: 'Wonokromo', mdpl: 6.7},
+      {kecamatan: 'Wonocolo', mdpl: 5.7},
+      {kecamatan: 'Wiyung', mdpl: 9.7},
+      {kecamatan: 'Karang Pilang', mdpl: 8.7},
+      {kecamatan: 'Jambangan', mdpl: 7.7},
+      {kecamatan: 'Gayungan', mdpl: 6.7},
+      {kecamatan: 'Dukuh Pakis', mdpl: 24.7},
+      {kecamatan: 'Sawahan', mdpl: 18.7}
+    ]
+  };
+
+  const wilayahSelect = document.getElementById('wilayah');
+  const kecamatanSelect = document.getElementById('kecamatan');
+  const hitungBtn = document.getElementById('hitungBtn');
+  const hasilDiv = document.getElementById('hasil');
+
+  wilayahSelect.addEventListener('change', () => {
+    const wilayah = wilayahSelect.value;
+    kecamatanSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+    hasilDiv.innerHTML = '';
+    hitungBtn.disabled = true;
+
+    if (wilayah && dataWilayah[wilayah]) {
+      const kecamatanList = dataWilayah[wilayah];
+      kecamatanList.forEach((kec, idx) => {
+        const option = document.createElement('option');
+        option.value = idx;
+        option.textContent = kec.kecamatan;
+        kecamatanSelect.appendChild(option);
+      });
+      kecamatanSelect.disabled = false;
+    } else {
+      kecamatanSelect.disabled = true;
+    }
+  });
+
+  kecamatanSelect.addEventListener('change', () => {
+    hasilDiv.innerHTML = '';
+    hitungBtn.disabled = kecamatanSelect.value === '';
+  });
+
+  hitungBtn.addEventListener('click', () => {
+    const wilayah = wilayahSelect.value;
+    const kecamatanIdx = kecamatanSelect.value;
+
+    if (wilayah && kecamatanIdx !== '') {
+      const kecamatan = dataWilayah[wilayah][parseInt(kecamatanIdx)];
+      const mdpl = kecamatan.mdpl;
+      // Perhitungan waktu (tahun) = mdpl / 0.088
+      const waktu = mdpl / 0.088;
+
+      hasilDiv.innerHTML = `
+        <p><strong>Kecamatan:</strong> ${kecamatan.kecamatan}</p>
+        <p><strong>Ketinggian:</strong> ${mdpl} MDPL</p>
+        <p><strong>Perkiraan waktu akan tenggelam:</strong> ${waktu.toFixed(2)} tahun</p>
+      `;
+    }
+  });
+</script>
+
+</body>
+</html>
